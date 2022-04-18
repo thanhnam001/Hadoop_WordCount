@@ -44,6 +44,10 @@ Chạy hadoop map reduce
 
 `hadoop jar wordcount.jar WordCount /WordCount/Input /WordCount/Output`
 
+Chạy phần 3 với stop_words.text (cần đưa file stop word vào /WordCount/Input trước)
+
+`hadoop jar wordcount.jar WordCount /WordCount/Input /WordCount/Output -skip /WordCount/Input/stop_words.text`
+
 Kiểm tra file output
 
 `hdfs dfs -cat /WordCount/Output/*`
