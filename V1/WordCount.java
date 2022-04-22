@@ -14,14 +14,14 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class WordCount {
     public static class Map extends Mapper<Object, Text, Text, IntWritable>{
         private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
+        private Text keyword = new Text();
 
         public void map(Object key, Text sentence, Context context)
             throws IOException, InterruptedException{
                 StringTokenizer itr = new StringTokenizer(sentence.toString());
                 while(itr.hasMoreTokens()){
-                    word.set(itr.nextToken());
-                    context.write(word,one);
+                    keyword.set(itr.nextToken());
+                    context.write(keyword,one);
                 }
         }
     }

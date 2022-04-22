@@ -28,17 +28,11 @@ import org.apache.hadoop.util.ToolRunner;
 public class WordCount {
     public static class Map extends Mapper<Object, Text, Text, IntWritable>{
         private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
-        private String path;
+        private Text keyword = new Text();
         private Set<String> stopwords = new HashSet<String>();
 
         @Override
         protected void setup(Mapper.Context context) throws IOException, InterruptedException {
-            if (context.getInputSplit() instanceof FileSplit){
-                this.path = ((FileSplit) context.getInputSplit()).getPath().toString();
-            } else {
-                this.path = context.getInputSplit().toString();
-            }
             URI[] localPaths = context.getCacheFiles();
             parseStopWord(localPaths[0]);
         }
@@ -61,8 +55,8 @@ public class WordCount {
                 while(itr.hasMoreTokens()){
                     String nt=itr.nextToken();
                     if (!stopwords.contains(nt)){
-                        word.set(nt);
-                        context.write(word,one);
+                        keyword.set(nt);
+                        context.write(keyword,one);
                     }
                 }
         }
@@ -81,12 +75,6 @@ public class WordCount {
     public static void main(String[] args) throws Exception{
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf,"word count");
-        for (int i = 0; i < args.length; i += 1) {
-            if ("-skip".equals(args[i])) {
-              i += 1;
-              job.addCacheFile(new Path(args[i]).toUri());
-            }
-          }
         job.setJarByClass(WordCount.class);
         job.setMapperClass(Map.class);
         job.setCombinerClass(Reduce.class);
@@ -95,6 +83,11 @@ public class WordCount {
         job.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        for (int i = 0; i < args.length; i += 1) {
+            if ("-skip".equals(args[i])) {
+              job.addCacheFile(new Path(args[i+1]).toUri());
+            }
+        }
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
